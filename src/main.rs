@@ -1,30 +1,47 @@
-use interaction_combinators::cell::{Cell, InteractionNet, Port};
+use interaction_combinators::cell::{Cell, InteractionNet, Label, Port, Wire};
 
 fn main() {
-    // Create a new interaction net
     let mut net = InteractionNet::new();
 
-    // Create a couple of cells
     let cell1 = Cell {
         arity: 2,
-        principal_port: Port { connected_to: None },
-        auxiliary_ports: vec![Port { connected_to: None }, Port { connected_to: None }],
+        principal_port: Port {
+            label: Label::PRINCIPAL,
+        },
+        auxiliary_ports: vec![
+            Port {
+                label: Label::AUXILIAR,
+            },
+            Port {
+                label: Label::AUXILIAR,
+            },
+        ],
+        label: Label::PRINCIPAL,
     };
+    net.add_cell(cell1);
 
     let cell2 = Cell {
         arity: 1,
-        principal_port: Port { connected_to: None },
-        auxiliary_ports: vec![Port { connected_to: None }],
+        principal_port: Port {
+            label: Label::PRINCIPAL,
+        },
+        auxiliary_ports: vec![],
+        label: Label::AUXILIAR,
     };
-
-    // Add the cells to the net
-    net.add_cell(cell1);
     net.add_cell(cell2);
 
-    // Connect ports between cells
+    let free_port1 = Port {
+        label: Label::PRINCIPAL,
+    };
+    net.add_free_port(free_port1);
+
+    let free_port2 = Port {
+        label: Label::AUXILIAR,
+    };
+    net.add_free_port(free_port2);
+
     net.connect_ports(0, 0, 1, 0);
     net.connect_ports(0, 1, 1, 0);
 
-    // Print the net to see the connections
-    println!("{:#?}", net);
+    println!("{:?}", net);
 }
