@@ -6,7 +6,7 @@
 // sx x y = (x + y) + y
 // 0 x y = 0
 
-use crate::cell::{Cell, Label, Port};
+use crate::cell::{Cell, Label, Port, InteractionNet, Wire};
 
 pub fn successor_cell() -> Cell {
     Cell {
@@ -21,7 +21,6 @@ pub fn successor_cell() -> Cell {
     }
 }
 
-// Define the zero cell
 pub fn zero_cell() -> Cell {
     Cell {
         arity: 0,
@@ -33,7 +32,6 @@ pub fn zero_cell() -> Cell {
     }
 }
 
-// Define the plus cell
 pub fn plus_cell() -> Cell {
     Cell {
         arity: 2,
@@ -51,3 +49,5 @@ pub fn plus_cell() -> Cell {
         label: Label::PRINCIPAL, // You can adjust the label as needed
     }
 }
+
+// to implement interaction, we kind-off need to "slice" the net, reduce the sliced part and connect it together again. Also we need a way to choose which reduction to start with. Reductions are done when two principal ports are connected by a wire.

@@ -44,4 +44,10 @@ fn main() {
     net.connect_ports(0, 1, 1, 0);
 
     println!("{:?}", net);
+
+    let possible_reds = net.possible_reductions();
+    println!("Possible reduction in wire: {:?}", possible_reds);
+    let first_red = possible_reds[0];
+    let wire_to_reduce = &net.wires[first_red];
+    println!("Wire to reduce: {:?}", wire_to_reduce);
 }

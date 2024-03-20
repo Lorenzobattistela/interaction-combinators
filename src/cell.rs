@@ -30,7 +30,7 @@ pub struct Wire {
 #[derive(Debug)]
 pub struct InteractionNet {
     cells: Vec<Cell>,
-    wires: Vec<Wire>,
+    pub wires: Vec<Wire>,
     free_ports: Vec<Port>,
 }
 
@@ -39,7 +39,7 @@ impl InteractionNet {
         InteractionNet {
             cells: Vec::new(),
             wires: Vec::new(),
-            free_ports: Vec::new(), // Initializing free ports collection
+            free_ports: Vec::new(),
         }
     }
 
@@ -69,72 +69,19 @@ impl InteractionNet {
         self.add_wire(new_wire);
     }
 
-    pub fn interact_successor_plus(&mut self, successor_index: usize, plus_index: usize) {
-        // Get references to the successor and plus cells
-        let successor_cell = &self.cells[successor_index];
-        let plus_cell = &self.cells[plus_index];
-
-        // Ensure the arity of the successor cell is 1
-        if successor_cell.arity != 1 {
-            panic!("Successor cell arity must be 1.");
+    // returns all the wires that have two principal ports connected
+    pub fn possible_reductions(&self) -> Vec<usize> {
+        let mut reductions = Vec::new();
+        for (i, wire) in self.wires.iter().enumerate() {
+            if let (Some((_from_cell, from_port)), Some((_to_cell, to_port))) =
+                (wire.from, wire.to)
+            {
+                // port 0 is principal port
+                if from_port == 0 as usize && to_port == 0 as usize{
+                    reductions.push(i);
+                }
+            }
         }
-
-        // Ensure the arity of the plus cell is 2
-        if plus_cell.arity != 2 {
-            panic!("Plus cell arity must be 2.");
-        }
-
-        // Ensure the principal port of the successor cell is connected to the principal port of the plus cell
-        self.connect_ports(
-            successor_index,
-            0, // Principal port index of successor
-            plus_index,
-            0, // Principal port index of plus
-        );
-
-        // Create a new plus cell
-        let new_plus_cell = Cell {
-            arity: 2,
-            principal_port: Port {
-                label: Label::AUXILIAR,
-            }, // Aux port of s becomes principal port of new plus cell
-            auxiliary_ports: vec![
-                Port {
-                    label: Label::AUXILIAR,
-                },
-                Port {
-                    label: Label::PRINCIPAL,
-                },
-            ], // Aux port 1 is a free port, Aux port 2 is a successor cell
-            label: Label::PRINCIPAL, // You can adjust the label as needed
-        };
-
-        // Add the new plus cell to the interaction net
-        self.add_cell(new_plus_cell);
-
-        // Index of the newly added plus cell
-        let new_plus_index = self.cells.len() - 1;
-
-        // Connect aux port 2 of the resulting plus cell to a successor cell
-        let new_successor_index = self.cells.len(); // Index of the new successor cell
-        let new_successor_cell = crate::unary_arithmetics::successor_cell(); // Create a new successor cell
-        self.add_cell(new_successor_cell);
-        self.connect_ports(
-            new_plus_index,
-            1, // Aux port 2 index of the resulting plus cell
-            new_successor_index,
-            0, // Principal port index of the new successor cell
-        );
-
-        // Connect the aux port of the new successor cell to aux port 2 of the plus cell
-        self.connect_ports(
-            new_successor_index,
-            0, // Principal port index of the new successor cell
-            plus_index,
-            1, // Aux port 2 index of the plus cell
-        );
-
-        // Convert the aux port 1 of the resulting plus cell to a free port
-        self.add_free_port(plus_cell.auxiliary_ports[0].clone());
+        reductions
     }
 }
