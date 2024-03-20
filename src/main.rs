@@ -1,4 +1,7 @@
-use interaction_combinators::cell::{Cell, InteractionNet, Label, Port, Wire};
+use interaction_combinators::{
+    cell::{Cell, InteractionNet, Label, Port, Wire},
+    unary_arithmetics::reduce_sum_suc,
+};
 
 fn main() {
     let mut net = InteractionNet::new();
@@ -50,4 +53,6 @@ fn main() {
     let first_red = possible_reds[0];
     let wire_to_reduce = &net.wires[first_red];
     println!("Wire to reduce: {:?}", wire_to_reduce);
+
+    reduce_sum_suc(net);
 }
