@@ -81,5 +81,52 @@ pub fn reduce_sum_suc(sum_net: InteractionNet) -> InteractionNet {
     res
 }
 
+fn has_zero_and_sum_ports(port1: &Port, port2: &Port) -> bool {
+    let has_zero = matches!(port1.label, Label::ZERO) || matches!(port2.label, Label::ZERO);
+    let has_sum = matches!(port1.label, Label::SUM) || matches!(port2.label, Label::SUM);
+    has_zero && has_sum && (port1.label != port2.label)
+}
 
+pub fn reduce_sum_zero(sum_net: InteractionNet) -> InteractionNet {
+    let possible_reductions = sum_net.possible_reductions();
+    let mut res = InteractionNet::new();
+    
+    for &reduction in possible_reductions.iter() {
+        let wire = &sum_net.wires[reduction];
+        println!("{:?}", wire);
+        if let Some((from_cell_index, from_port_index)) = wire.from {
+            if let Some((to_cell_index, to_port_index)) = wire.to {
+                let from_port = match sum_net.get_port(from_cell_index, from_port_index) {
+                    Some(from_port) => from_port,
+                    None => panic!("Something went wrong"),
+                };
+                let to_port = match sum_net.get_port(to_cell_index, to_port_index) {
+                    Some(to_port) => to_port,
+                    None => panic!("Something went wrong"),
+                };
+
+                let a = match to_port {
+                    Port {
+                        label: Label::ZERO,
+                    } => true,
+                    _ => false,
+                };
+
+                let b = match from_port {
+                    Port {
+                        label: Label::SUM,
+                    } => true,
+                    _ => false,
+                };
+
+                println! {"{:?}", to_port};
+                println!("{:?}", from_port);
+
+                let connections = sum_net.get_all_connections(from_cell_index, from_port_index);
+                println!("{:?}", connections);
+            }
+        }
+    }
+    res
+}
 
