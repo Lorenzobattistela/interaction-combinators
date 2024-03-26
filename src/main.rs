@@ -1,6 +1,6 @@
 use interaction_combinators::{
     cell::{Cell, InteractionNet, Label, Port, Wire},
-    unary_arithmetics::reduce_sum_suc,
+    unary_arithmetics::{has_ports_with_label, has_zero_and_sum_ports, reduce_sum_suc},
 };
 
 fn main() {
@@ -55,4 +55,15 @@ fn main() {
     println!("Wire to reduce: {:?}", wire_to_reduce);
 
     reduce_sum_suc(net);
+
+    let sum_port = Port { label: Label::SUM };
+
+    let zero_port = Port { label: Label::ZERO };
+
+    let has_sum_zero_ports = has_zero_and_sum_ports(&sum_port, &zero_port);
+    println!("Has zero and sum ports: {}", has_sum_zero_ports);
+
+    // checking same res using dif function
+    let has_ports_label = has_ports_with_label(Label::SUM, Label::ZERO, &sum_port, &zero_port);
+    println!("Has zero and sum ports general: {}", has_ports_label);
 }
