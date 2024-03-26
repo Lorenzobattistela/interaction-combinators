@@ -81,16 +81,22 @@ pub fn reduce_sum_suc(sum_net: InteractionNet) -> InteractionNet {
     res
 }
 
-fn has_zero_and_sum_ports(port1: &Port, port2: &Port) -> bool {
+pub fn has_zero_and_sum_ports(port1: &Port, port2: &Port) -> bool {
     let has_zero = matches!(port1.label, Label::ZERO) || matches!(port2.label, Label::ZERO);
     let has_sum = matches!(port1.label, Label::SUM) || matches!(port2.label, Label::SUM);
     has_zero && has_sum && (port1.label != port2.label)
 }
 
+pub fn has_ports_with_label(label1: Label, label2: Label, port1: &Port, port2: &Port) -> bool {
+    let has_label1 = matches!(port1.label, label1) || matches!(port2.label, label1);
+    let has_label2 = matches!(port1.label, label2) || matches!(port2.label, label2);
+    has_label1 && has_label2 && (port1.label != port2.label)
+}
+
 pub fn reduce_sum_zero(sum_net: InteractionNet) -> InteractionNet {
     let possible_reductions = sum_net.possible_reductions();
     let mut res = InteractionNet::new();
-    
+
     for &reduction in possible_reductions.iter() {
         let wire = &sum_net.wires[reduction];
         println!("{:?}", wire);
@@ -105,23 +111,6 @@ pub fn reduce_sum_zero(sum_net: InteractionNet) -> InteractionNet {
                     None => panic!("Something went wrong"),
                 };
 
-                let a = match to_port {
-                    Port {
-                        label: Label::ZERO,
-                    } => true,
-                    _ => false,
-                };
-
-                let b = match from_port {
-                    Port {
-                        label: Label::SUM,
-                    } => true,
-                    _ => false,
-                };
-
-                println! {"{:?}", to_port};
-                println!("{:?}", from_port);
-
                 let connections = sum_net.get_all_connections(from_cell_index, from_port_index);
                 println!("{:?}", connections);
             }
@@ -129,4 +118,3 @@ pub fn reduce_sum_zero(sum_net: InteractionNet) -> InteractionNet {
     }
     res
 }
-
