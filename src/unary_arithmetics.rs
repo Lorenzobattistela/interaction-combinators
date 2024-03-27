@@ -87,6 +87,12 @@ pub fn has_zero_and_sum_ports(port1: &Port, port2: &Port) -> bool {
     has_zero && has_sum && (port1.label != port2.label)
 }
 
+pub fn has_cell_with_label(label1: Label, label2: Label, cell1: &Cell, cell2: &Cell) -> bool {
+    let has_label1 = matches!(cell1.label, label1) || matches!(cell2.label, label1);
+    let has_label2 = matches!(cell1.label, label2) || matches!(cell2.label, label2);
+    has_label1 && has_label2 && (cell1.label != cell2.label)
+}
+
 pub fn has_ports_with_label(label1: Label, label2: Label, port1: &Port, port2: &Port) -> bool {
     let has_label1 = matches!(port1.label, label1) || matches!(port2.label, label1);
     let has_label2 = matches!(port1.label, label2) || matches!(port2.label, label2);
@@ -111,8 +117,16 @@ pub fn reduce_sum_zero(sum_net: InteractionNet) -> InteractionNet {
                     None => panic!("Something went wrong"),
                 };
 
+                println!("From_port: {:?}, To_port: {:?}", from_port, to_port);
+                assert!(has_ports_with_label(
+                    Label::SUM,
+                    Label::ZERO,
+                    &from_port,
+                    &to_port
+                ));
+
                 let connections = sum_net.get_all_connections(from_cell_index, from_port_index);
-                println!("{:?}", connections);
+                println!("Connections: {:?}", connections);
             }
         }
     }
