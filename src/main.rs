@@ -74,13 +74,15 @@ fn main() {
     let zero_cell = zero_cell();
     let sum_cell = plus_cell();
 
-    zero_sum_net.add_cell(zero_cell);
-    zero_sum_net.add_cell(sum_cell);
+    zero_sum_net.add_cell(zero_cell.clone());
+    zero_sum_net.add_cell(sum_cell.clone());
+
+    zero_sum_net.connect_ports(0, 0, 1, 0);
 
     println!("Net: {:?}", zero_sum_net);
 
     let has_cell_w_label = has_cell_with_label(Label::SUM, Label::ZERO, &zero_cell, &sum_cell);
     println!("Has cell with labels 0 and sum: {}", has_cell_w_label);
 
-    // reduce_sum_zero(net);
+    reduce_sum_zero(net);
 }

@@ -24,9 +24,7 @@ pub fn successor_cell() -> Cell {
 pub fn zero_cell() -> Cell {
     Cell {
         arity: 0,
-        principal_port: Port {
-            label: Label::PRINCIPAL,
-        },
+        principal_port: Port { label: Label::ZERO },
         auxiliary_ports: Vec::new(),
         label: Label::ZERO,
     }
@@ -35,17 +33,8 @@ pub fn zero_cell() -> Cell {
 pub fn plus_cell() -> Cell {
     Cell {
         arity: 2,
-        principal_port: Port {
-            label: Label::PRINCIPAL,
-        },
-        auxiliary_ports: vec![
-            Port {
-                label: Label::AUXILIAR,
-            },
-            Port {
-                label: Label::AUXILIAR,
-            },
-        ],
+        principal_port: Port { label: Label::SUM },
+        auxiliary_ports: vec![Port { label: Label::SUM }, Port { label: Label::SUM }],
         label: Label::SUM,
     }
 }
@@ -101,7 +90,14 @@ pub fn has_ports_with_label(label1: Label, label2: Label, port1: &Port, port2: &
 
 pub fn reduce_sum_zero(sum_net: InteractionNet) -> InteractionNet {
     let possible_reductions = sum_net.possible_reductions();
+    println!("possible_reductions: {:?}", possible_reductions);
     let mut res = InteractionNet::new();
+    assert!(has_cell_with_label(
+        Label::ZERO,
+        Label::SUM,
+        &sum_net.cells[0],
+        &sum_net.cells[1]
+    ));
 
     for &reduction in possible_reductions.iter() {
         let wire = &sum_net.wires[reduction];
@@ -118,15 +114,27 @@ pub fn reduce_sum_zero(sum_net: InteractionNet) -> InteractionNet {
                 };
 
                 println!("From_port: {:?}, To_port: {:?}", from_port, to_port);
-                assert!(has_ports_with_label(
-                    Label::SUM,
-                    Label::ZERO,
-                    &from_port,
-                    &to_port
-                ));
 
-                let connections = sum_net.get_all_connections(from_cell_index, from_port_index);
-                println!("Connections: {:?}", connections);
+                if has_ports_with_label(Label::SUM, Label::ZERO, from_port, to_port) {
+                    let sum_cell_index = if from_port.label == Label::SUM {
+                        from_cell_index
+                    } else {
+                        to_cell_index
+                    };
+
+                    let y_port_index = 1; // Assuming the left auxiliary port represents y
+                    let x_plus_y_port_index = 2; // Assuming the right auxiliary port represents x + y
+
+                    let new_wire = Wire {
+                        from: Some((sum_cell_index, y_port_index)),
+                        to: Some((sum_cell_index, x_plus_y_port_index)),
+                    };
+
+                    res.add_wire(new_wire);
+
+                    // Remove the + cell and the 0 cell from the res interaction net
+                    // You'll need to implement a method to remove cells from the InteractionNet
+                }
             }
         }
     }

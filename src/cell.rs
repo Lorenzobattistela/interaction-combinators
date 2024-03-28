@@ -14,7 +14,7 @@ pub struct Port {
 }
 
 // a cell has arity >= 0, that has one principal port and n auxiliary_ports
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Cell {
     pub arity: usize,
     pub principal_port: Port,
@@ -32,7 +32,7 @@ pub struct Wire {
 // port being connected to another one by means of a wire.
 #[derive(Debug)]
 pub struct InteractionNet {
-    cells: Vec<Cell>,
+    pub cells: Vec<Cell>,
     pub wires: Vec<Wire>,
     free_ports: Vec<Port>,
 }
